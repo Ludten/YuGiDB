@@ -61,7 +61,7 @@ class _HomePageState extends State<HomePage> {
     List data;
     if (searchstr == '') {
       data = await YGOcard.getAllCards(
-          'https://db.ygoprodeck.com/api/v7/cardinfo.php?num=20&offset=$_currentPage');
+          'https://db.ygoprodeck.com/api/v7/cardinfo.php?num=10&offset=$_currentPage');
 
       setState(() {
         cards = [];
@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
     } else {
       String val = searchstr.replaceAll(' ', '%20');
       data = await YGOcard.getAllCards(
-          'https://db.ygoprodeck.com/api/v7/cardinfo.php?fname=$val&num=20&offset=$_currentPage');
+          'https://db.ygoprodeck.com/api/v7/cardinfo.php?fname=$val&num=10&offset=$_currentPage');
 
       setState(() {
         cards = [];
@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _isLoading = false;
       cards.addAll(data);
-      _currentPage += 20;
+      _currentPage += 10;
     });
   }
 
@@ -93,17 +93,17 @@ class _HomePageState extends State<HomePage> {
     List data;
     if (searchstr == '') {
       data = await YGOcard.getAllCards(
-          'https://db.ygoprodeck.com/api/v7/cardinfo.php?num=20&offset=$_currentPage');
+          'https://db.ygoprodeck.com/api/v7/cardinfo.php?num=10&offset=$_currentPage');
     } else {
       String val = searchstr.replaceAll(' ', '%20');
       data = await YGOcard.getAllCards(
-          'https://db.ygoprodeck.com/api/v7/cardinfo.php?fname=$val=20&offset=$_currentPage');
+          'https://db.ygoprodeck.com/api/v7/cardinfo.php?fname=$val=10&offset=$_currentPage');
     }
 
     setState(() {
       _isLoading = false;
       cards.addAll(data);
-      _currentPage += 20;
+      _currentPage += 10;
     });
   }
 
