@@ -86,9 +86,9 @@ class _HomePageState extends State<HomePage> {
   Future<void> _loadMoreData() async {
     if (_isLoading) return;
 
-    setState(() {
-      _isLoading = true;
-    });
+    // setState(() {
+    //   _isLoading = true;
+    // });
 
     List data;
     if (searchstr == '') {
@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
     } else {
       String val = searchstr.replaceAll(' ', '%20');
       data = await YGOcard.getAllCards(
-          'https://db.ygoprodeck.com/api/v7/cardinfo.php?fname=$val=10&offset=$_currentPage');
+          'https://db.ygoprodeck.com/api/v7/cardinfo.php?fname=$val&num=10&offset=$_currentPage');
     }
 
     setState(() {
@@ -152,82 +152,103 @@ class _HomePageState extends State<HomePage> {
                 ? const Center(
                     child: CircularProgressIndicator(),
                   )
-                : GridView.builder(
+                : SingleChildScrollView(
                     controller: _scrollController,
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: (3 / 4),
-                      mainAxisSpacing: 20,
-                      crossAxisSpacing: 20,
-                    ),
-                    padding: const EdgeInsets.all(10.0),
-                    itemCount: cards.length,
-                    itemBuilder: (BuildContext context, int index) {
-                      Color color;
-                      if (cards[index].cardType.contains('Spell')) {
-                        color = Colors.greenAccent; // new color
-                      } else if (cards[index].cardType.contains('Trap')) {
-                        color = const Color.fromARGB(
-                            255, 220, 135, 235); // new color
-                      } else if (cards[index].cardType.contains('Ritual')) {
-                        color = Colors.blueGrey; // new color
-                      } else if (cards[index].cardType.contains('Fusion')) {
-                        color = const Color.fromARGB(
-                            255, 162, 35, 185); // new color
-                      } else if (cards[index].cardType.contains('Link')) {
-                        color = Colors.lightBlueAccent; // new color
-                      } else if (cards[index].cardType.contains('XYZ')) {
-                        color =
-                            const Color.fromARGB(255, 47, 47, 47); // new color
-                      } else if (cards[index].cardType.contains('Synchro')) {
-                        color =
-                            const Color.fromRGBO(192, 192, 192, 1); // new color
-                      } else {
-                        color = Colors.blue; // new color
-                      }
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => NewScreen(
-                                      data: cards[index],
-                                      color: color,
-                                    )),
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.all(10.0),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: color,
-                              boxShadow: [
-                                BoxShadow(color: color, spreadRadius: 3),
-                              ]),
-                          child: Column(
-                            children: [
-                              Image.network(
-                                cards[index].imageUrl,
-                                width: 100.0,
-                                height: 150.0,
-                                fit: BoxFit.cover,
-                              ),
-                              const SizedBox(height: 15.0),
-                              Center(
-                                child: Text((cards[index].cardName),
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    )),
-                              ),
-                            ],
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const ScrollPhysics(),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: (2 / 3),
+                        mainAxisSpacing: 20,
+                        crossAxisSpacing: 20,
+                      ),
+                      padding: const EdgeInsets.all(10.0),
+                      itemCount: cards.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        Offset? _tapPosition;
+                        Color color;
+                        if (cards[index].cardType.contains('Spell')) {
+                          color = Colors.greenAccent; // new color
+                        } else if (cards[index].cardType.contains('Trap')) {
+                          color = const Color.fromARGB(
+                              255, 220, 135, 235); // new color
+                        } else if (cards[index].cardType.contains('Ritual')) {
+                          color = Colors.blueGrey; // new color
+                        } else if (cards[index].cardType.contains('Fusion')) {
+                          color = const Color.fromARGB(
+                              255, 162, 35, 185); // new color
+                        } else if (cards[index].cardType.contains('Link')) {
+                          color = Colors.lightBlueAccent; // new color
+                        } else if (cards[index].cardType.contains('XYZ')) {
+                          color = const Color.fromARGB(
+                              255, 47, 47, 47); // new color
+                        } else if (cards[index].cardType.contains('Synchro')) {
+                          color = const Color.fromRGBO(
+                              192, 192, 192, 1); // new color
+                        } else {
+                          color = Colors.blue; // new color
+                        }
+                        return Listener(
+                          onPointerDown: (details) {
+                            _tapPosition =
+                                details.position; // capture the tap position
+                          },
+                          onPointerUp: (details) {
+                            onTapFunction() {
+                              // Do something here when the user taps a grid item
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => NewScreen(
+                                          data: cards[index],
+                                          color: color,
+                                        )),
+                              );
+                            }
+
+                            if (_tapPosition != null) {
+                              final distance =
+                                  (_tapPosition! - details.position).distance;
+                              if (distance < 10) {
+                                onTapFunction();
+                              }
+                            }
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(10.0),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: color,
+                                boxShadow: [
+                                  BoxShadow(color: color, spreadRadius: 3),
+                                ]),
+                            child: Column(
+                              children: [
+                                Image.network(
+                                  cards[index].imageUrl,
+                                  width: 100.0,
+                                  height: 150.0,
+                                  fit: BoxFit.cover,
+                                ),
+                                const SizedBox(height: 15.0),
+                                Center(
+                                  child: Text((cards[index].cardName),
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                      )),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    }),
+                        );
+                      },
+                    ),
+                  ),
           ),
         ],
       ),
